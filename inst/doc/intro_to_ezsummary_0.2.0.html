@@ -1,0 +1,1239 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<meta name="author" content="Hao Zhu" />
+
+<meta name="date" content="2016-07-02" />
+
+<title>Introduction to ezsummary 0.2.0</title>
+
+
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+</style>
+
+
+
+<link href="data:text/css;charset=utf-8,body%20%7B%0Abackground%2Dcolor%3A%20%23fff%3B%0Amargin%3A%201em%20auto%3B%0Amax%2Dwidth%3A%20700px%3B%0Aoverflow%3A%20visible%3B%0Apadding%2Dleft%3A%202em%3B%0Apadding%2Dright%3A%202em%3B%0Afont%2Dfamily%3A%20%22Open%20Sans%22%2C%20%22Helvetica%20Neue%22%2C%20Helvetica%2C%20Arial%2C%20sans%2Dserif%3B%0Afont%2Dsize%3A%2014px%3B%0Aline%2Dheight%3A%201%2E35%3B%0A%7D%0A%23header%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0A%23TOC%20%7B%0Aclear%3A%20both%3B%0Amargin%3A%200%200%2010px%2010px%3B%0Apadding%3A%204px%3B%0Awidth%3A%20400px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Aborder%2Dradius%3A%205px%3B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Afont%2Dsize%3A%2013px%3B%0Aline%2Dheight%3A%201%2E3%3B%0A%7D%0A%23TOC%20%2Etoctitle%20%7B%0Afont%2Dweight%3A%20bold%3B%0Afont%2Dsize%3A%2015px%3B%0Amargin%2Dleft%3A%205px%3B%0A%7D%0A%23TOC%20ul%20%7B%0Apadding%2Dleft%3A%2040px%3B%0Amargin%2Dleft%3A%20%2D1%2E5em%3B%0Amargin%2Dtop%3A%205px%3B%0Amargin%2Dbottom%3A%205px%3B%0A%7D%0A%23TOC%20ul%20ul%20%7B%0Amargin%2Dleft%3A%20%2D2em%3B%0A%7D%0A%23TOC%20li%20%7B%0Aline%2Dheight%3A%2016px%3B%0A%7D%0Atable%20%7B%0Amargin%3A%201em%20auto%3B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dcolor%3A%20%23DDDDDD%3B%0Aborder%2Dstyle%3A%20outset%3B%0Aborder%2Dcollapse%3A%20collapse%3B%0A%7D%0Atable%20th%20%7B%0Aborder%2Dwidth%3A%202px%3B%0Apadding%3A%205px%3B%0Aborder%2Dstyle%3A%20inset%3B%0A%7D%0Atable%20td%20%7B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dstyle%3A%20inset%3B%0Aline%2Dheight%3A%2018px%3B%0Apadding%3A%205px%205px%3B%0A%7D%0Atable%2C%20table%20th%2C%20table%20td%20%7B%0Aborder%2Dleft%2Dstyle%3A%20none%3B%0Aborder%2Dright%2Dstyle%3A%20none%3B%0A%7D%0Atable%20thead%2C%20table%20tr%2Eeven%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Ap%20%7B%0Amargin%3A%200%2E5em%200%3B%0A%7D%0Ablockquote%20%7B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Apadding%3A%200%2E25em%200%2E75em%3B%0A%7D%0Ahr%20%7B%0Aborder%2Dstyle%3A%20solid%3B%0Aborder%3A%20none%3B%0Aborder%2Dtop%3A%201px%20solid%20%23777%3B%0Amargin%3A%2028px%200%3B%0A%7D%0Adl%20%7B%0Amargin%2Dleft%3A%200%3B%0A%7D%0Adl%20dd%20%7B%0Amargin%2Dbottom%3A%2013px%3B%0Amargin%2Dleft%3A%2013px%3B%0A%7D%0Adl%20dt%20%7B%0Afont%2Dweight%3A%20bold%3B%0A%7D%0Aul%20%7B%0Amargin%2Dtop%3A%200%3B%0A%7D%0Aul%20li%20%7B%0Alist%2Dstyle%3A%20circle%20outside%3B%0A%7D%0Aul%20ul%20%7B%0Amargin%2Dbottom%3A%200%3B%0A%7D%0Apre%2C%20code%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0Aborder%2Dradius%3A%203px%3B%0Acolor%3A%20%23333%3B%0Awhite%2Dspace%3A%20pre%2Dwrap%3B%20%0A%7D%0Apre%20%7B%0Aborder%2Dradius%3A%203px%3B%0Amargin%3A%205px%200px%2010px%200px%3B%0Apadding%3A%2010px%3B%0A%7D%0Apre%3Anot%28%5Bclass%5D%29%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Acode%20%7B%0Afont%2Dfamily%3A%20Consolas%2C%20Monaco%2C%20%27Courier%20New%27%2C%20monospace%3B%0Afont%2Dsize%3A%2085%25%3B%0A%7D%0Ap%20%3E%20code%2C%20li%20%3E%20code%20%7B%0Apadding%3A%202px%200px%3B%0A%7D%0Adiv%2Efigure%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0Aimg%20%7B%0Abackground%2Dcolor%3A%20%23FFFFFF%3B%0Apadding%3A%202px%3B%0Aborder%3A%201px%20solid%20%23DDDDDD%3B%0Aborder%2Dradius%3A%203px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Amargin%3A%200%205px%3B%0A%7D%0Ah1%20%7B%0Amargin%2Dtop%3A%200%3B%0Afont%2Dsize%3A%2035px%3B%0Aline%2Dheight%3A%2040px%3B%0A%7D%0Ah2%20%7B%0Aborder%2Dbottom%3A%204px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Apadding%2Dbottom%3A%202px%3B%0Afont%2Dsize%3A%20145%25%3B%0A%7D%0Ah3%20%7B%0Aborder%2Dbottom%3A%202px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Afont%2Dsize%3A%20120%25%3B%0A%7D%0Ah4%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23f7f7f7%3B%0Amargin%2Dleft%3A%208px%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Ah5%2C%20h6%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23ccc%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Aa%20%7B%0Acolor%3A%20%230033dd%3B%0Atext%2Ddecoration%3A%20none%3B%0A%7D%0Aa%3Ahover%20%7B%0Acolor%3A%20%236666ff%3B%20%7D%0Aa%3Avisited%20%7B%0Acolor%3A%20%23800080%3B%20%7D%0Aa%3Avisited%3Ahover%20%7B%0Acolor%3A%20%23BB00BB%3B%20%7D%0Aa%5Bhref%5E%3D%22http%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0Aa%5Bhref%5E%3D%22https%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0A%0Acode%20%3E%20span%2Ekw%20%7B%20color%3A%20%23555%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Edt%20%7B%20color%3A%20%23902000%3B%20%7D%20%0Acode%20%3E%20span%2Edv%20%7B%20color%3A%20%2340a070%3B%20%7D%20%0Acode%20%3E%20span%2Ebn%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Efl%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Ech%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Est%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Eco%20%7B%20color%3A%20%23888888%3B%20font%2Dstyle%3A%20italic%3B%20%7D%20%0Acode%20%3E%20span%2Eot%20%7B%20color%3A%20%23007020%3B%20%7D%20%0Acode%20%3E%20span%2Eal%20%7B%20color%3A%20%23ff0000%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Efu%20%7B%20color%3A%20%23900%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%20code%20%3E%20span%2Eer%20%7B%20color%3A%20%23a61717%3B%20background%2Dcolor%3A%20%23e3d2d2%3B%20%7D%20%0A" rel="stylesheet" type="text/css" />
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Introduction to ezsummary 0.2.0</h1>
+<h4 class="author"><em>Hao Zhu</em></h4>
+<h4 class="date"><em>2016-07-02</em></h4>
+
+
+
+<p>When we do a typical statistical summary to a piece of data, we usually:</p>
+<ul>
+<li>Perform quantitative analyses, including mean, standard deviation and etc, to most continuous variables.</li>
+<li>Perform qualitative (or say categorical) analyses, in most cases, counts and proportions, to categorical variables.</li>
+<li>Compare the results, if we even stratified the data into groups.</li>
+<li>Paste the results of these two types of analyses into one table, if applicable.</li>
+<li>Decorate the result table before we send it to print</li>
+</ul>
+<p>This <code>ezsummary</code> package allows you to:</p>
+<ul>
+<li>Generate most common data summarizing tasks in a single command by pre-programing these tasks into options that you can toggle on and off.</li>
+<li>Perform customized analysis using very simple syntax.</li>
+<li>Have the results of both quantitative and categorical analyses displayed in one single table.</li>
+<li>Quickly generate summarizations of different sub groups using <code>dplyr::group_by()</code> function.</li>
+<li>Spread the stratified results into a “wide” format</li>
+<li>Easily combine columns into customized format and make the table ready to be printed</li>
+<li>Have both columns and rows sorted as you expected (instead of get sorted in alphabetical order if you use <code>tidyr::spread()</code> directly. )</li>
+</ul>
+<p>This package is not intent to solve every single summarization problem. The goal is to simplify and speed up 80% of the most common data summarization tasks. For the rest 20%, one can always use <code>dplyr</code>, <code>tidyr</code> or other tools to get what they want.</p>
+<p>This package builds heavily on Hadley’s <code>dplyr</code> and <code>tidyr</code>. If you are not familar with neither these two, you may want to read the package vignettes for at least <code>dplyr</code> first before you continue.</p>
+<div id="sample-data-mtcars" class="section level2">
+<h2>Sample Data: mtcars</h2>
+<p>We will use <code>mtcars</code> to demonstrate the functionality of this package as it provides a good amount of both continuous and categorical data and almost everyone is familar with it.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">dim</span>(mtcars)</code></pre></div>
+<pre><code>## [1] 32 11</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">head</span>(mtcars)</code></pre></div>
+<pre><code>##                    mpg cyl disp  hp drat    wt  qsec vs am gear carb
+## Mazda RX4         21.0   6  160 110 3.90 2.620 16.46  0  1    4    4
+## Mazda RX4 Wag     21.0   6  160 110 3.90 2.875 17.02  0  1    4    4
+## Datsun 710        22.8   4  108  93 3.85 2.320 18.61  1  1    4    1
+## Hornet 4 Drive    21.4   6  258 110 3.08 3.215 19.44  1  0    3    1
+## Hornet Sportabout 18.7   8  360 175 3.15 3.440 17.02  0  0    3    2
+## Valiant           18.1   6  225 105 2.76 3.460 20.22  1  0    3    1</code></pre>
+</div>
+<div id="functions-available-in-ezsummary" class="section level2">
+<h2>Functions available in <code>ezsummary</code></h2>
+<p>Here is a list of functions available in <code>ezsummary</code>:</p>
+<ul>
+<li>ezsummary_q() (or ezsummary_quantitative())</li>
+<li>ezsummary_c() (or ezsummary_categorical())</li>
+<li>ezmarkup()</li>
+<li>var_types()</li>
+<li>ezsummary()</li>
+</ul>
+<p>Note: I picked this order as it’s easier to explain in this way. __If you want a quick jump start, you can go to the <a href="#ezsummary_q">ezsummary_q()</a> and <a href="#ezsummary-var_type">ezsummary() &amp; var_type()</a></p>
+</div>
+<div id="ezmarkup" class="section level2">
+<h2>ezmarkup()</h2>
+<p>I will start with <code>ezmarkup()</code> as some functionalities of other <code>ezsummary</code> functions depend on it. This function can combine two or multiple columns and format the result in a customized way. In some way, it is similar with <code>tidyr::unite()</code> but it provides a more flexible way to format the result (but I admit it’s not that well written :P).</p>
+<p>In <code>ezmarkup()</code>, we use a dot to indicate a column. If you want to combine two columns, you put them in a pair of <code>[]</code>, like <code>[..]</code>. The interesting part is, inside the brackets, you can literally do whatever you want. For example, <code>[. (.)]</code> will put the second column in a pair of () sitting one space after the first column.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(dplyr)
+<span class="kw">library</span>(ezsummary)
+<span class="kw">library</span>(knitr)
+
+mtcars %&gt;%<span class="st"> </span>
+<span class="st">  </span><span class="kw">select</span>(<span class="dv">1</span>:<span class="dv">3</span>) %&gt;%
+<span class="st">  </span><span class="kw">ezmarkup</span>(<span class="st">&quot;.[. (.)]&quot;</span>) %&gt;%
+<span class="st">  </span><span class="kw">head</span>()</code></pre></div>
+<pre><code>##    mpg cyl (disp)
+## 1 21.0    6 (160)
+## 2 21.0    6 (160)
+## 3 22.8    4 (108)
+## 4 21.4    6 (258)
+## 5 18.7    8 (360)
+## 6 18.1    6 (225)</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">mtcars %&gt;%<span class="st"> </span>
+<span class="st">  </span><span class="kw">select</span>(<span class="dv">1</span>:<span class="dv">3</span>) %&gt;%
+<span class="st">  </span><span class="kw">ezmarkup</span>(<span class="st">&quot;.[. ~~.~~ :-)]&quot;</span>) %&gt;%
+<span class="st">  </span><span class="kw">head</span>()</code></pre></div>
+<pre><code>##    mpg cyl ~~disp~~ :-)
+## 1 21.0    6 ~~160~~ :-)
+## 2 21.0    6 ~~160~~ :-)
+## 3 22.8    4 ~~108~~ :-)
+## 4 21.4    6 ~~258~~ :-)
+## 5 18.7    8 ~~360~~ :-)
+## 6 18.1    6 ~~225~~ :-)</code></pre>
+</div>
+<div id="ezsummary_q" class="section level2">
+<h2>ezsummary_q()</h2>
+<div id="preset-functions" class="section level3">
+<h3>Preset functions</h3>
+<p>Let’s get back to data summarization. The most common tasks for quantitative analyses have been pre-programmed and you can just use those options to decide whether you want to include them in the analysis. Such pre-programmed options include:</p>
+<ul>
+<li><code>total</code>: Total counts of records including <code>NA</code>.</li>
+<li><code>missing</code>: Counts of missing records (<code>NA</code>).</li>
+<li><code>n</code>: Counts of records other than <code>NA</code>.</li>
+<li><code>mean</code>: Mean of records (after excluding <code>NA</code>, same for everything below).</li>
+<li><code>sd</code>: Standard deviation.</li>
+<li><code>sem</code>: Standard error of the mean.</li>
+<li><code>median</code>: Median</li>
+<li><code>quantile</code>: 0, 25, 50, 75, 100 percentile of the records</li>
+</ul>
+<p>By default, <code>mean</code> and <code>sd</code> are turned on as they are commonly used.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">mtcars %&gt;%<span class="st"> </span><span class="kw">ezsummary</span>(<span class="dt">n =</span> T, <span class="dt">quantile =</span> T) %&gt;%<span class="st"> </span><span class="kw">kable</span>()</code></pre></div>
+<table>
+<thead>
+<tr class="header">
+<th align="left">variable</th>
+<th align="right">n</th>
+<th align="right">mean</th>
+<th align="right">sd</th>
+<th align="right">q0</th>
+<th align="right">q25</th>
+<th align="right">q50</th>
+<th align="right">q75</th>
+<th align="right">q100</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">mpg</td>
+<td align="right">32</td>
+<td align="right">20.091</td>
+<td align="right">6.027</td>
+<td align="right">10.400</td>
+<td align="right">15.425</td>
+<td align="right">19.200</td>
+<td align="right">22.80</td>
+<td align="right">33.900</td>
+</tr>
+<tr class="even">
+<td align="left">cyl</td>
+<td align="right">32</td>
+<td align="right">6.188</td>
+<td align="right">1.786</td>
+<td align="right">4.000</td>
+<td align="right">4.000</td>
+<td align="right">6.000</td>
+<td align="right">8.00</td>
+<td align="right">8.000</td>
+</tr>
+<tr class="odd">
+<td align="left">disp</td>
+<td align="right">32</td>
+<td align="right">230.722</td>
+<td align="right">123.939</td>
+<td align="right">71.100</td>
+<td align="right">120.825</td>
+<td align="right">196.300</td>
+<td align="right">326.00</td>
+<td align="right">472.000</td>
+</tr>
+<tr class="even">
+<td align="left">hp</td>
+<td align="right">32</td>
+<td align="right">146.688</td>
+<td align="right">68.563</td>
+<td align="right">52.000</td>
+<td align="right">96.500</td>
+<td align="right">123.000</td>
+<td align="right">180.00</td>
+<td align="right">335.000</td>
+</tr>
+<tr class="odd">
+<td align="left">drat</td>
+<td align="right">32</td>
+<td align="right">3.597</td>
+<td align="right">0.535</td>
+<td align="right">2.760</td>
+<td align="right">3.080</td>
+<td align="right">3.695</td>
+<td align="right">3.92</td>
+<td align="right">4.930</td>
+</tr>
+<tr class="even">
+<td align="left">wt</td>
+<td align="right">32</td>
+<td align="right">3.217</td>
+<td align="right">0.978</td>
+<td align="right">1.513</td>
+<td align="right">2.581</td>
+<td align="right">3.325</td>
+<td align="right">3.61</td>
+<td align="right">5.424</td>
+</tr>
+<tr class="odd">
+<td align="left">qsec</td>
+<td align="right">32</td>
+<td align="right">17.849</td>
+<td align="right">1.787</td>
+<td align="right">14.500</td>
+<td align="right">16.892</td>
+<td align="right">17.710</td>
+<td align="right">18.90</td>
+<td align="right">22.900</td>
+</tr>
+<tr class="even">
+<td align="left">vs</td>
+<td align="right">32</td>
+<td align="right">0.438</td>
+<td align="right">0.504</td>
+<td align="right">0.000</td>
+<td align="right">0.000</td>
+<td align="right">0.000</td>
+<td align="right">1.00</td>
+<td align="right">1.000</td>
+</tr>
+<tr class="odd">
+<td align="left">am</td>
+<td align="right">32</td>
+<td align="right">0.406</td>
+<td align="right">0.499</td>
+<td align="right">0.000</td>
+<td align="right">0.000</td>
+<td align="right">0.000</td>
+<td align="right">1.00</td>
+<td align="right">1.000</td>
+</tr>
+<tr class="even">
+<td align="left">gear</td>
+<td align="right">32</td>
+<td align="right">3.688</td>
+<td align="right">0.738</td>
+<td align="right">3.000</td>
+<td align="right">3.000</td>
+<td align="right">4.000</td>
+<td align="right">4.00</td>
+<td align="right">5.000</td>
+</tr>
+<tr class="odd">
+<td align="left">carb</td>
+<td align="right">32</td>
+<td align="right">2.812</td>
+<td align="right">1.615</td>
+<td align="right">1.000</td>
+<td align="right">2.000</td>
+<td align="right">2.000</td>
+<td align="right">4.00</td>
+<td align="right">8.000</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="customized-functions" class="section level3">
+<h3>Customized Functions</h3>
+<p>If you don’t see what you want in this list, you can also program some functions on your own by defining them in the option <code>extra</code>. Multiple extra functions can be piped in as a vector. The name of the vector element is the label for the result column. The functions are wrapped as strings with the variable indicated by the dot. For example, if you want to get the maximum value and counts of records larger than 20, you can use the code below</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">mtcars %&gt;%<span class="st"> </span>
+<span class="st">  </span><span class="kw">ezsummary</span>(
+    <span class="dt">extra =</span> <span class="kw">c</span>(
+      <span class="dt">max =</span> <span class="st">&quot;max(., na.rm = T)&quot;</span>,
+      <span class="dt">above20 =</span> <span class="st">&quot;sum(. &gt; 20, na.rm = T)&quot;</span>
+    )
+  ) %&gt;%
+<span class="st">  </span><span class="kw">kable</span>()</code></pre></div>
+<table>
+<thead>
+<tr class="header">
+<th align="left">variable</th>
+<th align="right">mean</th>
+<th align="right">sd</th>
+<th align="right">max</th>
+<th align="right">above20</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">mpg</td>
+<td align="right">20.091</td>
+<td align="right">6.027</td>
+<td align="right">33.900</td>
+<td align="right">14</td>
+</tr>
+<tr class="even">
+<td align="left">cyl</td>
+<td align="right">6.188</td>
+<td align="right">1.786</td>
+<td align="right">8.000</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td align="left">disp</td>
+<td align="right">230.722</td>
+<td align="right">123.939</td>
+<td align="right">472.000</td>
+<td align="right">32</td>
+</tr>
+<tr class="even">
+<td align="left">hp</td>
+<td align="right">146.688</td>
+<td align="right">68.563</td>
+<td align="right">335.000</td>
+<td align="right">32</td>
+</tr>
+<tr class="odd">
+<td align="left">drat</td>
+<td align="right">3.597</td>
+<td align="right">0.535</td>
+<td align="right">4.930</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="left">wt</td>
+<td align="right">3.217</td>
+<td align="right">0.978</td>
+<td align="right">5.424</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td align="left">qsec</td>
+<td align="right">17.849</td>
+<td align="right">1.787</td>
+<td align="right">22.900</td>
+<td align="right">3</td>
+</tr>
+<tr class="even">
+<td align="left">vs</td>
+<td align="right">0.438</td>
+<td align="right">0.504</td>
+<td align="right">1.000</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td align="left">am</td>
+<td align="right">0.406</td>
+<td align="right">0.499</td>
+<td align="right">1.000</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="left">gear</td>
+<td align="right">3.688</td>
+<td align="right">0.738</td>
+<td align="right">5.000</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td align="left">carb</td>
+<td align="right">2.812</td>
+<td align="right">1.615</td>
+<td align="right">8.000</td>
+<td align="right">0</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="summarizing-by-group" class="section level3">
+<h3>Summarizing by group</h3>
+<p>In many cases, we usually need to summarize two or more groups of data. In that case, instead of subsetting, you can use <code>dplyr::group_by()</code> together with <code>ezsummary()</code>, <code>ezsummary_q()</code> and <code>ezsummary_c()</code>.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">mtcars %&gt;%
+<span class="st">  </span><span class="kw">group_by</span>(cyl) %&gt;%
+<span class="st">  </span><span class="kw">ezsummary</span>(<span class="dt">digits =</span> <span class="dv">1</span>) %&gt;%
+<span class="st">  </span><span class="kw">kable</span>()</code></pre></div>
+<table>
+<thead>
+<tr class="header">
+<th align="right">cyl</th>
+<th align="left">variable</th>
+<th align="right">mean</th>
+<th align="right">sd</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">4</td>
+<td align="left">mpg</td>
+<td align="right">26.7</td>
+<td align="right">4.5</td>
+</tr>
+<tr class="even">
+<td align="right">6</td>
+<td align="left">mpg</td>
+<td align="right">19.7</td>
+<td align="right">1.5</td>
+</tr>
+<tr class="odd">
+<td align="right">8</td>
+<td align="left">mpg</td>
+<td align="right">15.1</td>
+<td align="right">2.6</td>
+</tr>
+<tr class="even">
+<td align="right">4</td>
+<td align="left">disp</td>
+<td align="right">105.1</td>
+<td align="right">26.9</td>
+</tr>
+<tr class="odd">
+<td align="right">6</td>
+<td align="left">disp</td>
+<td align="right">183.3</td>
+<td align="right">41.6</td>
+</tr>
+<tr class="even">
+<td align="right">8</td>
+<td align="left">disp</td>
+<td align="right">353.1</td>
+<td align="right">67.8</td>
+</tr>
+<tr class="odd">
+<td align="right">4</td>
+<td align="left">hp</td>
+<td align="right">82.6</td>
+<td align="right">20.9</td>
+</tr>
+<tr class="even">
+<td align="right">6</td>
+<td align="left">hp</td>
+<td align="right">122.3</td>
+<td align="right">24.3</td>
+</tr>
+<tr class="odd">
+<td align="right">8</td>
+<td align="left">hp</td>
+<td align="right">209.2</td>
+<td align="right">51.0</td>
+</tr>
+<tr class="even">
+<td align="right">4</td>
+<td align="left">drat</td>
+<td align="right">4.1</td>
+<td align="right">0.4</td>
+</tr>
+<tr class="odd">
+<td align="right">6</td>
+<td align="left">drat</td>
+<td align="right">3.6</td>
+<td align="right">0.5</td>
+</tr>
+<tr class="even">
+<td align="right">8</td>
+<td align="left">drat</td>
+<td align="right">3.2</td>
+<td align="right">0.4</td>
+</tr>
+<tr class="odd">
+<td align="right">4</td>
+<td align="left">wt</td>
+<td align="right">2.3</td>
+<td align="right">0.6</td>
+</tr>
+<tr class="even">
+<td align="right">6</td>
+<td align="left">wt</td>
+<td align="right">3.1</td>
+<td align="right">0.4</td>
+</tr>
+<tr class="odd">
+<td align="right">8</td>
+<td align="left">wt</td>
+<td align="right">4.0</td>
+<td align="right">0.8</td>
+</tr>
+<tr class="even">
+<td align="right">4</td>
+<td align="left">qsec</td>
+<td align="right">19.1</td>
+<td align="right">1.7</td>
+</tr>
+<tr class="odd">
+<td align="right">6</td>
+<td align="left">qsec</td>
+<td align="right">18.0</td>
+<td align="right">1.7</td>
+</tr>
+<tr class="even">
+<td align="right">8</td>
+<td align="left">qsec</td>
+<td align="right">16.8</td>
+<td align="right">1.2</td>
+</tr>
+<tr class="odd">
+<td align="right">4</td>
+<td align="left">vs</td>
+<td align="right">0.9</td>
+<td align="right">0.3</td>
+</tr>
+<tr class="even">
+<td align="right">6</td>
+<td align="left">vs</td>
+<td align="right">0.6</td>
+<td align="right">0.5</td>
+</tr>
+<tr class="odd">
+<td align="right">8</td>
+<td align="left">vs</td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+</tr>
+<tr class="even">
+<td align="right">4</td>
+<td align="left">am</td>
+<td align="right">0.7</td>
+<td align="right">0.5</td>
+</tr>
+<tr class="odd">
+<td align="right">6</td>
+<td align="left">am</td>
+<td align="right">0.4</td>
+<td align="right">0.5</td>
+</tr>
+<tr class="even">
+<td align="right">8</td>
+<td align="left">am</td>
+<td align="right">0.1</td>
+<td align="right">0.4</td>
+</tr>
+<tr class="odd">
+<td align="right">4</td>
+<td align="left">gear</td>
+<td align="right">4.1</td>
+<td align="right">0.5</td>
+</tr>
+<tr class="even">
+<td align="right">6</td>
+<td align="left">gear</td>
+<td align="right">3.9</td>
+<td align="right">0.7</td>
+</tr>
+<tr class="odd">
+<td align="right">8</td>
+<td align="left">gear</td>
+<td align="right">3.3</td>
+<td align="right">0.7</td>
+</tr>
+<tr class="even">
+<td align="right">4</td>
+<td align="left">carb</td>
+<td align="right">1.5</td>
+<td align="right">0.5</td>
+</tr>
+<tr class="odd">
+<td align="right">6</td>
+<td align="left">carb</td>
+<td align="right">3.4</td>
+<td align="right">1.8</td>
+</tr>
+<tr class="even">
+<td align="right">8</td>
+<td align="left">carb</td>
+<td align="right">3.5</td>
+<td align="right">1.6</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="wide-format" class="section level3">
+<h3>“Wide” format</h3>
+<p>If you don’t want the categorical info be listed out separately as a column, you can use the <code>flavor</code> option (either “long” or “wide”). It will call <code>tidyr::gather()</code> and <code>tidyr::spread()</code> internally and resort columns in an order you would expect (unlike the default alphabetical sorting behavior of <code>tidyr::spread()</code>).</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">mtcars %&gt;%
+<span class="st">  </span><span class="kw">group_by</span>(cyl) %&gt;%
+<span class="st">  </span><span class="kw">ezsummary</span>(<span class="dt">flavor =</span> <span class="st">&quot;wide&quot;</span>, <span class="dt">digits =</span> <span class="dv">1</span>) %&gt;%<span class="st"> </span>
+<span class="st">  </span><span class="kw">kable</span>()</code></pre></div>
+<table>
+<thead>
+<tr class="header">
+<th align="left">variable</th>
+<th align="right">cyl.4_mean</th>
+<th align="right">cyl.4_sd</th>
+<th align="right">cyl.6_mean</th>
+<th align="right">cyl.6_sd</th>
+<th align="right">cyl.8_mean</th>
+<th align="right">cyl.8_sd</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">mpg</td>
+<td align="right">26.7</td>
+<td align="right">4.5</td>
+<td align="right">19.7</td>
+<td align="right">1.5</td>
+<td align="right">15.1</td>
+<td align="right">2.6</td>
+</tr>
+<tr class="even">
+<td align="left">disp</td>
+<td align="right">105.1</td>
+<td align="right">26.9</td>
+<td align="right">183.3</td>
+<td align="right">41.6</td>
+<td align="right">353.1</td>
+<td align="right">67.8</td>
+</tr>
+<tr class="odd">
+<td align="left">hp</td>
+<td align="right">82.6</td>
+<td align="right">20.9</td>
+<td align="right">122.3</td>
+<td align="right">24.3</td>
+<td align="right">209.2</td>
+<td align="right">51.0</td>
+</tr>
+<tr class="even">
+<td align="left">drat</td>
+<td align="right">4.1</td>
+<td align="right">0.4</td>
+<td align="right">3.6</td>
+<td align="right">0.5</td>
+<td align="right">3.2</td>
+<td align="right">0.4</td>
+</tr>
+<tr class="odd">
+<td align="left">wt</td>
+<td align="right">2.3</td>
+<td align="right">0.6</td>
+<td align="right">3.1</td>
+<td align="right">0.4</td>
+<td align="right">4.0</td>
+<td align="right">0.8</td>
+</tr>
+<tr class="even">
+<td align="left">qsec</td>
+<td align="right">19.1</td>
+<td align="right">1.7</td>
+<td align="right">18.0</td>
+<td align="right">1.7</td>
+<td align="right">16.8</td>
+<td align="right">1.2</td>
+</tr>
+<tr class="odd">
+<td align="left">vs</td>
+<td align="right">0.9</td>
+<td align="right">0.3</td>
+<td align="right">0.6</td>
+<td align="right">0.5</td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+</tr>
+<tr class="even">
+<td align="left">am</td>
+<td align="right">0.7</td>
+<td align="right">0.5</td>
+<td align="right">0.4</td>
+<td align="right">0.5</td>
+<td align="right">0.1</td>
+<td align="right">0.4</td>
+</tr>
+<tr class="odd">
+<td align="left">gear</td>
+<td align="right">4.1</td>
+<td align="right">0.5</td>
+<td align="right">3.9</td>
+<td align="right">0.7</td>
+<td align="right">3.3</td>
+<td align="right">0.7</td>
+</tr>
+<tr class="even">
+<td align="left">carb</td>
+<td align="right">1.5</td>
+<td align="right">0.5</td>
+<td align="right">3.4</td>
+<td align="right">1.8</td>
+<td align="right">3.5</td>
+<td align="right">1.6</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="unit-markup" class="section level3">
+<h3>Unit Markup</h3>
+<p>You can also ask ezsummary() to call <code>ezmarkup()</code> internally to combine columns to make “Table One” style tables. Here, since we assume you don’t need to know how many groups there are when you first run <code>ezsummary</code>, we use an option called <code>unit_markup</code> to mark the styles you want for each group.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">mtcars %&gt;%
+<span class="st">  </span><span class="kw">group_by</span>(carb) %&gt;%
+<span class="st">  </span><span class="kw">ezsummary</span>(<span class="dt">flavor =</span> <span class="st">&quot;wide&quot;</span>, <span class="dt">digits =</span> <span class="dv">1</span>, <span class="dt">unit_markup =</span> <span class="st">'[. (.)]'</span>) %&gt;%
+<span class="st">  </span><span class="kw">kable</span>()</code></pre></div>
+<table>
+<thead>
+<tr class="header">
+<th align="left">variable</th>
+<th align="left">carb.1_mean (carb.1_sd)</th>
+<th align="left">carb.2_mean (carb.2_sd)</th>
+<th align="left">carb.3_mean (carb.3_sd)</th>
+<th align="left">carb.4_mean (carb.4_sd)</th>
+<th align="left">carb.6_mean (carb.6_sd)</th>
+<th align="left">carb.8_mean (carb.8_sd)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">mpg</td>
+<td align="left">25.3 (6)</td>
+<td align="left">22.4 (5.5)</td>
+<td align="left">16.3 (1.1)</td>
+<td align="left">15.8 (3.9)</td>
+<td align="left">19.7 (0)</td>
+<td align="left">15 (0)</td>
+</tr>
+<tr class="even">
+<td align="left">cyl</td>
+<td align="left">4.6 (1)</td>
+<td align="left">5.6 (2.1)</td>
+<td align="left">8 (0)</td>
+<td align="left">7.2 (1)</td>
+<td align="left">6 (0)</td>
+<td align="left">8 (0)</td>
+</tr>
+<tr class="odd">
+<td align="left">disp</td>
+<td align="left">134.3 (75.9)</td>
+<td align="left">208.2 (122.5)</td>
+<td align="left">275.8 (0)</td>
+<td align="left">308.8 (132.1)</td>
+<td align="left">145 (0)</td>
+<td align="left">301 (0)</td>
+</tr>
+<tr class="even">
+<td align="left">hp</td>
+<td align="left">86 (19.8)</td>
+<td align="left">117.2 (44)</td>
+<td align="left">180 (0)</td>
+<td align="left">187 (62.9)</td>
+<td align="left">175 (0)</td>
+<td align="left">335 (0)</td>
+</tr>
+<tr class="odd">
+<td align="left">drat</td>
+<td align="left">3.7 (0.6)</td>
+<td align="left">3.7 (0.7)</td>
+<td align="left">3.1 (0)</td>
+<td align="left">3.6 (0.5)</td>
+<td align="left">3.6 (0)</td>
+<td align="left">3.5 (0)</td>
+</tr>
+<tr class="even">
+<td align="left">wt</td>
+<td align="left">2.5 (0.6)</td>
+<td align="left">2.9 (0.8)</td>
+<td align="left">3.9 (0.2)</td>
+<td align="left">3.9 (1.1)</td>
+<td align="left">2.8 (0)</td>
+<td align="left">3.6 (0)</td>
+</tr>
+<tr class="odd">
+<td align="left">qsec</td>
+<td align="left">19.5 (0.6)</td>
+<td align="left">18.2 (2)</td>
+<td align="left">17.7 (0.3)</td>
+<td align="left">17 (1.4)</td>
+<td align="left">15.5 (0)</td>
+<td align="left">14.6 (0)</td>
+</tr>
+<tr class="even">
+<td align="left">vs</td>
+<td align="left">1 (0)</td>
+<td align="left">0.5 (0.5)</td>
+<td align="left">0 (0)</td>
+<td align="left">0.2 (0.4)</td>
+<td align="left">0 (0)</td>
+<td align="left">0 (0)</td>
+</tr>
+<tr class="odd">
+<td align="left">am</td>
+<td align="left">0.6 (0.5)</td>
+<td align="left">0.4 (0.5)</td>
+<td align="left">0 (0)</td>
+<td align="left">0.3 (0.5)</td>
+<td align="left">1 (0)</td>
+<td align="left">1 (0)</td>
+</tr>
+<tr class="even">
+<td align="left">gear</td>
+<td align="left">3.6 (0.5)</td>
+<td align="left">3.8 (0.8)</td>
+<td align="left">3 (0)</td>
+<td align="left">3.6 (0.7)</td>
+<td align="left">5 (0)</td>
+<td align="left">5 (0)</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="rounding-methods" class="section level3">
+<h3>Rounding Methods</h3>
+<p>As I demonstrated above, you can use <code>digits</code> to control the rounding digits. In fact, in <code>ezsummary</code>, you can even control rounding method by adjusting the <code>rounding method</code> option. Available methods are “round”(default), “signif”, “ceiling” and “floor”. You can check <code>?round</code> in R for details.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">mtcars %&gt;%
+<span class="st">  </span><span class="kw">ezsummary</span>(<span class="dt">rounding_method =</span> <span class="st">&quot;ceiling&quot;</span>) %&gt;%
+<span class="st">  </span><span class="kw">kable</span>()</code></pre></div>
+<table>
+<thead>
+<tr class="header">
+<th align="left">variable</th>
+<th align="right">mean</th>
+<th align="right">sd</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">mpg</td>
+<td align="right">20.091</td>
+<td align="right">6.027</td>
+</tr>
+<tr class="even">
+<td align="left">cyl</td>
+<td align="right">6.188</td>
+<td align="right">1.786</td>
+</tr>
+<tr class="odd">
+<td align="left">disp</td>
+<td align="right">230.722</td>
+<td align="right">123.939</td>
+</tr>
+<tr class="even">
+<td align="left">hp</td>
+<td align="right">146.688</td>
+<td align="right">68.563</td>
+</tr>
+<tr class="odd">
+<td align="left">drat</td>
+<td align="right">3.597</td>
+<td align="right">0.535</td>
+</tr>
+<tr class="even">
+<td align="left">wt</td>
+<td align="right">3.217</td>
+<td align="right">0.978</td>
+</tr>
+<tr class="odd">
+<td align="left">qsec</td>
+<td align="right">17.849</td>
+<td align="right">1.787</td>
+</tr>
+<tr class="even">
+<td align="left">vs</td>
+<td align="right">0.438</td>
+<td align="right">0.504</td>
+</tr>
+<tr class="odd">
+<td align="left">am</td>
+<td align="right">0.406</td>
+<td align="right">0.499</td>
+</tr>
+<tr class="even">
+<td align="left">gear</td>
+<td align="right">3.688</td>
+<td align="right">0.738</td>
+</tr>
+<tr class="odd">
+<td align="left">carb</td>
+<td align="right">2.812</td>
+<td align="right">1.615</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div id="ezsummary_c" class="section level2">
+<h2>ezsummary_c()</h2>
+<p><code>ezsummary_c()</code> is for categorical summarization. Comparing with <code>ezsummary_q()</code>, it is very straight forward. It can take most of the options that `ezsummary_q() takes. You can customize if you want a “decimal” or “percent” output.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">mtcars %&gt;%
+<span class="st">  </span><span class="kw">select</span>(cyl, vs, am, gear, carb) %&gt;%
+<span class="st">  </span><span class="kw">ezsummary_c</span>() %&gt;%
+<span class="st">  </span><span class="kw">kable</span>()</code></pre></div>
+<table>
+<thead>
+<tr class="header">
+<th align="left">variable</th>
+<th align="right">count</th>
+<th align="right">p</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">cyl_4</td>
+<td align="right">11</td>
+<td align="right">0.344</td>
+</tr>
+<tr class="even">
+<td align="left">cyl_6</td>
+<td align="right">7</td>
+<td align="right">0.219</td>
+</tr>
+<tr class="odd">
+<td align="left">cyl_8</td>
+<td align="right">14</td>
+<td align="right">0.438</td>
+</tr>
+<tr class="even">
+<td align="left">vs_0</td>
+<td align="right">18</td>
+<td align="right">0.562</td>
+</tr>
+<tr class="odd">
+<td align="left">vs_1</td>
+<td align="right">14</td>
+<td align="right">0.438</td>
+</tr>
+<tr class="even">
+<td align="left">am_0</td>
+<td align="right">19</td>
+<td align="right">0.594</td>
+</tr>
+<tr class="odd">
+<td align="left">am_1</td>
+<td align="right">13</td>
+<td align="right">0.406</td>
+</tr>
+<tr class="even">
+<td align="left">gear_3</td>
+<td align="right">15</td>
+<td align="right">0.469</td>
+</tr>
+<tr class="odd">
+<td align="left">gear_4</td>
+<td align="right">12</td>
+<td align="right">0.375</td>
+</tr>
+<tr class="even">
+<td align="left">gear_5</td>
+<td align="right">5</td>
+<td align="right">0.156</td>
+</tr>
+<tr class="odd">
+<td align="left">carb_1</td>
+<td align="right">7</td>
+<td align="right">0.219</td>
+</tr>
+<tr class="even">
+<td align="left">carb_2</td>
+<td align="right">10</td>
+<td align="right">0.312</td>
+</tr>
+<tr class="odd">
+<td align="left">carb_3</td>
+<td align="right">3</td>
+<td align="right">0.094</td>
+</tr>
+<tr class="even">
+<td align="left">carb_4</td>
+<td align="right">10</td>
+<td align="right">0.312</td>
+</tr>
+<tr class="odd">
+<td align="left">carb_6</td>
+<td align="right">1</td>
+<td align="right">0.031</td>
+</tr>
+<tr class="even">
+<td align="left">carb_8</td>
+<td align="right">1</td>
+<td align="right">0.031</td>
+</tr>
+</tbody>
+</table>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">mtcars %&gt;%
+<span class="st">  </span><span class="kw">group_by</span>(cyl) %&gt;%
+<span class="st">  </span><span class="kw">select</span>(cyl, vs, am, gear, carb) %&gt;%
+<span class="st">  </span><span class="kw">ezsummary_c</span>(<span class="dt">p_type =</span> <span class="st">&quot;percent&quot;</span>, <span class="dt">flavor =</span> <span class="st">&quot;wide&quot;</span>, 
+              <span class="dt">unit_markup =</span> <span class="st">&quot;[. (.)]&quot;</span>, <span class="dt">digits =</span> <span class="dv">0</span>) %&gt;%
+<span class="st">  </span><span class="kw">kable</span>()</code></pre></div>
+<table>
+<thead>
+<tr class="header">
+<th align="left">variable</th>
+<th align="left">cyl.4_count (cyl.4_p)</th>
+<th align="left">cyl.6_count (cyl.6_p)</th>
+<th align="left">cyl.8_count (cyl.8_p)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">vs_0</td>
+<td align="left">1 (9%)</td>
+<td align="left">3 (43%)</td>
+<td align="left">14 (100%)</td>
+</tr>
+<tr class="even">
+<td align="left">vs_1</td>
+<td align="left">10 (91%)</td>
+<td align="left">4 (57%)</td>
+<td align="left">0 (0)</td>
+</tr>
+<tr class="odd">
+<td align="left">am_0</td>
+<td align="left">3 (27%)</td>
+<td align="left">4 (57%)</td>
+<td align="left">12 (86%)</td>
+</tr>
+<tr class="even">
+<td align="left">am_1</td>
+<td align="left">8 (73%)</td>
+<td align="left">3 (43%)</td>
+<td align="left">2 (14%)</td>
+</tr>
+<tr class="odd">
+<td align="left">gear_3</td>
+<td align="left">1 (9%)</td>
+<td align="left">2 (29%)</td>
+<td align="left">12 (86%)</td>
+</tr>
+<tr class="even">
+<td align="left">gear_4</td>
+<td align="left">8 (73%)</td>
+<td align="left">4 (57%)</td>
+<td align="left">0 (0)</td>
+</tr>
+<tr class="odd">
+<td align="left">gear_5</td>
+<td align="left">2 (18%)</td>
+<td align="left">1 (14%)</td>
+<td align="left">2 (14%)</td>
+</tr>
+<tr class="even">
+<td align="left">carb_1</td>
+<td align="left">5 (45%)</td>
+<td align="left">2 (29%)</td>
+<td align="left">0 (0)</td>
+</tr>
+<tr class="odd">
+<td align="left">carb_2</td>
+<td align="left">6 (55%)</td>
+<td align="left">0 (0)</td>
+<td align="left">4 (29%)</td>
+</tr>
+<tr class="even">
+<td align="left">carb_3</td>
+<td align="left">0 (0)</td>
+<td align="left">0 (0)</td>
+<td align="left">3 (21%)</td>
+</tr>
+<tr class="odd">
+<td align="left">carb_4</td>
+<td align="left">0 (0)</td>
+<td align="left">4 (57%)</td>
+<td align="left">6 (43%)</td>
+</tr>
+<tr class="even">
+<td align="left">carb_6</td>
+<td align="left">0 (0)</td>
+<td align="left">1 (14%)</td>
+<td align="left">0 (0)</td>
+</tr>
+<tr class="odd">
+<td align="left">carb_8</td>
+<td align="left">0 (0)</td>
+<td align="left">0 (0)</td>
+<td align="left">1 (7%)</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="ezsummary-var_type" class="section level2">
+<h2>ezsummary() &amp; var_type()</h2>
+<p>You might have already found that in the “ezsummary_q” section, I actually used <code>ezsummary()</code> instead of <code>ezsummary_q()</code>. Basically, <code>ezsummary()</code> is a wrapper function for both <code>ezsummary_q()</code> and <code>ezsummary_c()</code>. It automatically categorizes the options you passed in. It assumes all variables are continuous unless they are character strings. This function exists as an attempt to unify the analytic results of continuous and categorical variables into one table. In order to specify which variables you want to analyze as categorical variables, you need to specify them via <code>var_types()</code>, which takes a string of either “q” or “c” for each variable to be analyzed.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">mtcars %&gt;%
+<span class="st">  </span><span class="kw">select</span>(mpg, cyl, disp, gear) %&gt;%
+<span class="st">  </span><span class="kw">var_types</span>(<span class="st">&quot;qcqc&quot;</span>) %&gt;%
+<span class="st">  </span><span class="kw">ezsummary</span>(<span class="dt">n =</span> T) %&gt;%
+<span class="st">  </span><span class="kw">kable</span>()</code></pre></div>
+<table>
+<thead>
+<tr class="header">
+<th align="left">variable</th>
+<th align="left">n</th>
+<th align="left">mean/count</th>
+<th align="left">sd/p</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">mpg</td>
+<td align="left">32</td>
+<td align="left">20.091</td>
+<td align="left">6.027</td>
+</tr>
+<tr class="even">
+<td align="left">cyl_4</td>
+<td align="left">32</td>
+<td align="left">11</td>
+<td align="left">0.344</td>
+</tr>
+<tr class="odd">
+<td align="left">cyl_6</td>
+<td align="left">32</td>
+<td align="left">7</td>
+<td align="left">0.219</td>
+</tr>
+<tr class="even">
+<td align="left">cyl_8</td>
+<td align="left">32</td>
+<td align="left">14</td>
+<td align="left">0.438</td>
+</tr>
+<tr class="odd">
+<td align="left">disp</td>
+<td align="left">32</td>
+<td align="left">230.722</td>
+<td align="left">123.939</td>
+</tr>
+<tr class="even">
+<td align="left">gear_3</td>
+<td align="left">32</td>
+<td align="left">15</td>
+<td align="left">0.469</td>
+</tr>
+<tr class="odd">
+<td align="left">gear_4</td>
+<td align="left">32</td>
+<td align="left">12</td>
+<td align="left">0.375</td>
+</tr>
+<tr class="even">
+<td align="left">gear_5</td>
+<td align="left">32</td>
+<td align="left">5</td>
+<td align="left">0.156</td>
+</tr>
+</tbody>
+</table>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">mtcars %&gt;%
+<span class="st">  </span><span class="kw">select</span>(mpg, cyl, disp, gear) %&gt;%
+<span class="st">  </span><span class="kw">var_types</span>(<span class="st">&quot;qcqc&quot;</span>) %&gt;%
+<span class="st">  </span><span class="kw">group_by</span>(cyl) %&gt;%
+<span class="st">  </span><span class="kw">ezsummary</span>(<span class="dt">flavor =</span> <span class="st">&quot;wide&quot;</span>, <span class="dt">unit_markup =</span> <span class="st">&quot;[. (.)]&quot;</span>, 
+            <span class="dt">p_type =</span> <span class="st">&quot;percent&quot;</span>, <span class="dt">digits =</span> <span class="dv">1</span>) %&gt;%
+<span class="st">  </span><span class="kw">kable</span>(<span class="dt">col.names =</span> <span class="kw">c</span>(<span class="st">&quot;&quot;</span>, <span class="st">&quot;4 Cylinders&quot;</span>, <span class="st">&quot;6 Cylinders&quot;</span>, <span class="st">&quot;8 Cylinder&quot;</span>))</code></pre></div>
+<table>
+<thead>
+<tr class="header">
+<th></th>
+<th align="left">4 Cylinders</th>
+<th align="left">6 Cylinders</th>
+<th align="left">8 Cylinder</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>mpg</td>
+<td align="left">26.7 (4.5)</td>
+<td align="left">19.7 (1.5)</td>
+<td align="left">15.1 (2.6)</td>
+</tr>
+<tr class="even">
+<td>disp</td>
+<td align="left">105.1 (26.9)</td>
+<td align="left">183.3 (41.6)</td>
+<td align="left">353.1 (67.8)</td>
+</tr>
+<tr class="odd">
+<td>gear_3</td>
+<td align="left">1 (9.1%)</td>
+<td align="left">2 (28.6%)</td>
+<td align="left">12 (85.7%)</td>
+</tr>
+<tr class="even">
+<td>gear_4</td>
+<td align="left">8 (72.7%)</td>
+<td align="left">4 (57.1%)</td>
+<td align="left">0 (0)</td>
+</tr>
+<tr class="odd">
+<td>gear_5</td>
+<td align="left">2 (18.2%)</td>
+<td align="left">1 (14.3%)</td>
+<td align="left">2 (14.3%)</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

@@ -1,120 +1,204 @@
-#' Simple Summary for Quantitative/binary variables
+#' Easily summarize quantitative data
 #'
-#' @description Function ezsummary_quantitative provides simple summary (Mean and
-#' standard deviation with/without N) for quantitative data while function ezsummary_binary
-#' provides simple summary (freq and percentage with/without total counts) for binary data.
-#' These two function are simply wrappers outside of a summarise_each function. If
-#' we just want to know the most basic statistical summary, this function can save us some
-#' typing time. It also provide the option to include number of subjects inside the analyses.
+#' @description \code{ezsummary_quantitative()} summarizes quantitative data.
 #'
-#' @param tbl The input matrix of data you would like to analyze.
-#' @param n n is a True/False switch that controls whether counts(N) should be included in
-#' the output
-#' @param mean a T/F switch to control whether mean should be calculated
-#' @param sd a T/F switch to control whether standard deviation should be calculated
-#' @param sem a T/F switch to control whether standard error of the mean should be calculated
-#' @param median a T/F switch to control whether median should be calculated
-#' @param quantile a T/F switch to control whether 0%, 25%, 50%, 75% and 100% quantile should
-#' be calculated
-#' @param round.N Rounding Number
-#' @param flavor Flavor has two possible inputs: "long" and "wide". "Long" is the default
-#' setting which will put grouping information on the left side of the table. It is more
-#' machine readable and is good to be passed into the next analytical stage if needed.
-#' "Wide" is more print ready (except for column names, which you can fix in the next step,
-#' or fix in LaTex or packages like \code{htmlTable}). In the "wide" mode, the analyzed
-#' variable will be the only "ID" variable and all the stats values will be presented ogranized
-#' by the grouping variables (if any). If there is no grouping, the outputs of "wide" and
-#' "long" will be the same.
-#' @param unit_markup When unit_markup is not NULL, it will call the ezmarkup function and
-#' perform column combination here. To make everyone's life easier, I'm using the term "unit"
-#' here. Each unit mean each group of statistical summary results. If you want to
-#' know mean and stand deviation, these two values are your units so you can put something
-#' like "[. (.)]" there
-#'
-#' @return It will return in the same format as a summarise_each function does
+#' @param tbl A vector, a data.frame or a \code{dplyr} \code{tbl}.
+#' @param total a T/F value; total counts of records including both missing
+#' and read data records. Default is \code{FALSE}.
+#' @param n A T/F value; total counts of records that is not missing. Default
+#' is \code{FALSE}.
+#' @param missing a T/F value; total counts of records that went missing(
+#' \code{NA}). Default is \code{FALSE}.
+#' @param mean A T/F value; the average of a set of data. Default value is
+#' \code{TRUE}.
+#' @param sd A T/F value; the standard deviation of a set of data. Default value
+#' is \code{TRUE}.
+#' @param sem A T/F value; the standard error of the mean of a set of data.
+#' Default value is \code{FALSE}.
+#' @param median A T/F value; the median of a set of data. Default value is
+#' \code{FALSE}.
+#' @param quantile A T/F value controlling 5 outputs; the 0\%, 25\%, 50\%, 75\%
+#' and 100\% percentile of a set of data. Default value is \code{FALSE}.
+#' @param extra A character vector offering extra customizability to this
+#' function. Please see Details for detail.
+#' @param digits A numeric value determining the rounding digits; Replacement
+#' for \code{round.N}. Default setting is to read from \code{getOption()}.
+#' @param rounding_type A character string determining the rounding method;
+#' possible values are \code{round}, \code{signif}, \code{ceiling} and
+#' \code{floor}. When \code{ceiling} or \code{floor} is selected, \code{digits}
+#' won't have any effect.
+#' @param flavor A character string with two possible inputs: "long" and "wide".
+#' "Long" is the default setting which will put grouping information on the left
+#' side of the table. It is more machine readable and is good to be passed into
+#' the next analytical stage if needed. "Wide" is more print ready (except for
+#' column names, which you can fix in the next step, or fix in LaTex or
+#' packages like \code{htmlTable}). In the "wide" mode, the analyzed variable
+#' will be the only "ID" variable and all the stats values will be presented
+#' ogranized by the grouping variables (if any). If there is no grouping, the
+#' outputs of "wide" and "long" will be the same.
+#' @param fill If set, missing values created by the "wide" flavor will be
+#' replaced with this value. Please check \code{\link[tidyr]{spread}} for
+#' details. Default value is \code{0}
+#' @param unit_markup When unit_markup is not NULL, it will call the ezmarkup
+#' function and perform column combination here. To make everyone's life
+#' easier, I'm using the term "unit" here. Each unit mean each group of
+#' statistical summary results. If you want to know mean and stand deviation,
+#' these two values are your units so you can put something like "[. (.)]" there
+#' #' @param P Deprecated; Will change the value of \code{p_type} if used in this
+#' version.
+#' @param round.N Deprecated; Will change the value of \code{rounding_type} if
+#' used in this version.
 #'
 #' @examples
 #' library(dplyr)
-#' mtcars %>% group_by(am) %>% select(mpg, wt, qsec) %>% ezsummary_quantitative()
+#' mtcars %>%
+#'   group_by(am) %>%
+#'   select(mpg, wt, qsec) %>%
+#'   ezsummary_quantitative()
 #'
+#' @importFrom stats na.omit sd median quantile
 #' @export
-ezsummary_quantitative <- function(tbl, n = FALSE, mean = TRUE, sd = TRUE, sem = FALSE, median = FALSE, quantile = FALSE, round.N=3, flavor = "long", unit_markup = NULL){
+
+ezsummary_quantitative <- function(
+  tbl, total = FALSE, n = FALSE, missing = FALSE,
+  mean = TRUE, sd = TRUE, sem = FALSE, median = FALSE, quantile = FALSE,
+  extra = NULL,
+  digits = 3,
+  rounding_type = c("round", "signif", "ceiling", "floor"),
+  round.N=3,
+  flavor = c("long", "wide"), fill = 0, unit_markup = NULL
+){
+
   # Define the following variable to avoid NOTE on RMD check
-  variable = NULL
-  # If the input tbl is a vector, convert it to a 1-D data.frame and set it as a 'tbl' (dplyr).
+  variable = value = analysis = NULL
+
+  if(round.N != 3){
+    warning("Option round.N has been deprecated. Please use 'digits' instead.")
+    digits <- round.N
+  }
+
+  rounding_type <- match.arg(rounding_type)
+  flavor <- match.arg(flavor)
+
   if(is.vector(tbl)){
     tbl <- as.tbl(as.data.frame(tbl))
     attributes(tbl)$names <- "unknown"
-    warning("ezsummary cannot detect the naming information from an atomic vector. Please try to use something like 'select(mtcars, gear)' to replace mtcars$gear in your code.")
+    warning('ezsummary cannot detect the naming information from an atomic ',
+            'vector. If you want to have full naming information, please ',
+            'pass the value in as a data frame using `select` from dplyr.')
   }
 
-  if(flavor != "long" & flavor !="wide"){warning('The value of flavor has to be either "long" or "wide". Now the input is evalued as if you entered "long" by default. Please revise your function inputs!')}
+  group_name <- attributes(tbl)$vars
+  var_name <- attributes(tbl)$names
+  if (!is.null(group_name)){
+    group_name <- as.character(group_name)
+    var_name <- var_name[!var_name %in% group_name]
+  }
+  n_group <- length(group_name)
+  n_var <- length(var_name)
 
-  # Try to obtain grouping and variable information from the input tbl
-  group.name <- attributes(tbl)$vars
-  var.name <- attributes(tbl)$names
-  if (!is.null(group.name)){
-    group.name <- as.character(group.name)
-    var.name <- var.name[!var.name %in% group.name]
+  if(n_group == 0 & flavor == "wide"){flavor <- "long"}
+
+  # Generate a list of tasks needed to be done
+  available_tasks <- c(
+    total = "length(.)",
+    n = "length(stats::na.omit(.))",
+    missing = "sum(is.na(.))",
+    mean = "mean(., na.rm = TRUE)",
+    sd = "stats::sd(., na.rm = TRUE)",
+    sem = "stats::sd(., na.rm = TRUE) / sqrt(length(stats::na.omit(.)))",
+    median = "stats::median(., na.rm = TRUE)",
+    q0 = "stats::quantile(., na.rm = TRUE)[1]",
+    q25 = "stats::quantile(., na.rm = TRUE)[2]",
+    q50 = "stats::quantile(., na.rm = TRUE)[3]",
+    q75 = "stats::quantile(., na.rm = TRUE)[4]",
+    q100 = "stats::quantile(., na.rm = TRUE)[5]"
+  )
+
+  tasks_list <- c(
+    available_tasks[
+      c(total, n, missing, mean, sd, sem, median,
+        quantile, quantile, quantile, quantile, quantile)
+      ],
+    extra
+  )
+
+  tasks_names <- names(tasks_list)
+
+  tbl_summary_raw <- tbl %>%
+    summarise_each(funs_(tasks_list))
+
+  if(n_group == 0){
+    tbl_summary <- suppressWarnings(gather(tbl_summary_raw, variable, value))
+  }else{
+    tbl_summary <- tbl_summary_raw %>%
+      gather(variable, value, seq(-1, -n_group))
+  }
+
+  tbl_summary <- tbl_summary %>%
+    mutate(value = `if`(
+      rounding_type %in% c("round", "signif"),
+      eval(call(rounding_type, value, digits)),
+      eval(call(rounding_type, value))
+    ))
+
+  if(length(tasks_list) == 1){
+    tbl_summary["analysis"] <- tasks_names
+  }else{
+    if(n_var == 1){
+      names(tbl_summary)[names(tbl_summary) == "variable"] <- "analysis"
+      tbl_summary["variable"] <- var_name
+    }else{
+      tbl_summary <- tbl_summary %>%
+        separate(variable, into = c("variable", "analysis"))
     }
-  n.group <- length(group.name)
-  n.var <- length(var.name)
+  }
 
-  # Set up the summarise_each formula based on the input.
-  options <- c("N = length(na.omit(.))", "mean = round(mean(na.omit(.)), round.N)", "sd = round(sd(na.omit(.)), round.N)", "sem = round(sd(na.omit(.)) / sqrt(length(na.omit(.))), round.N)", "median = median(na.omit(.))", "q0 = quantile(.,names = F)[1], q25 = quantile(.,names = F)[2], q50 = quantile(.,names = F)[3], q75 = quantile(.,names = F)[4], q100 = quantile(.,names = F)[5]")
-  option_names <- c("N", "mean", "sd", "sem", "median", "q0", "q25", "q50", "q75", "q100")
-  option_switches <- c(n, mean, sd, sem, median, quantile)
-  option_name_switches <- c(n, mean, sd, sem, median, quantile, quantile, quantile, quantile, quantile)
-  calculation_formula <- paste0("summarise_each(tbl, funs(",
-                                paste0(options[option_switches],collapse = ", "),
-                                "))")
+  if(flavor == "wide"){
+    tbl_summary[group_name] <- sapply(
+      group_name, function(x){paste(x, tbl_summary[x][[1]], sep = ".")}
+    )
 
-  # Perform the summarise_each calculation and pass the results to table_raw
-  table_raw <- eval(parse(text=calculation_formula))
+    tbl_summary <- tbl_summary %>%
+      unite_("analysis", c(group_name, "analysis"))
 
-  # Standardize names when either n.var or the number of statistical analyses is small
-    # When there is only one analysis (except(quantile))
-    if (sum(option_name_switches) == 1){names(table_raw)[(n.group+1):ncol(table_raw)] <- paste(names(table_raw)[(n.group+1):ncol(table_raw)], option_names[option_name_switches], sep="_")}
-    # When there is only one variable but the number of analyses is not 1
-    if (n.var == 1 & sum(option_name_switches) != 1){names(table_raw)[(n.group+1):ncol(table_raw)] <- paste(var.name, names(table_raw)[(n.group+1):ncol(table_raw)], sep="_")}
+    group_reorder <- sapply(group_name, function(x){
+      paste(x, attr(tbl, "labels")[x][[1]], sep = ".")
+    }) %>%
+      apply(1, paste, collapse = "_")
+    tasks_names <- c(sapply(group_reorder, function(x){
+      paste(x, tasks_names, sep = "_")
+    }))
+  }
 
-  # Transform the raw table to a organized tabular output
-  table_export <- melt(table_raw, id.vars = group.name) %>%
-    separate(variable, into = c("variable", "statistics"), sep="_(?=[^_]*$)")
-  # I have to stop in the middle and provide sort information to 'statistics' as
-  # the dplyr::dcast function will automaticall sort all the values
-  table_export$statistics <- factor(table_export$statistics, levels = c("N", "mean", "sd", "sem", "median", "q0", "q25", "q50", "q75", "q100"))
+  tbl_summary <- tbl_summary %>%
+    spread(analysis, value, fill = fill) %>%
+    ungroup() %>%
+    mutate(variable = factor(variable, levels = setdiff(var_name, group_name))) %>%
+    arrange_(c("variable", group_name))
 
-  # Use dplyr::dcast to reformat the table
-  dcast_formula <- as.formula(paste0(c(group.name, "variable ~ statistics"), collapse = " + "))
-  table_export <- table_export %>% dcast(dcast_formula)
+  tbl_summary <- tbl_summary[c(
+    `if`(flavor == "long" & n_group != 0, group_name, NULL),
+    "variable", tasks_names
+    )]
 
   # Ezmarkup
   if(!is.null(unit_markup)){
-    ezmarkup_formula <- paste0(paste0(rep(".", n.group), collapse = ""), ".", unit_markup)
-    table_export <- ezmarkup(table_export, ezmarkup_formula)
-  }
-
-  # Turn the table from long to wide if needed
-  if(flavor == "wide"){
-    for(i in 1:n.group){
-      table_export[,group.name[i]] <- paste(group.name[i], unlist(table_export[,group.name[i]]), sep=".")
+    if(flavor == "wide" & n_group != 0){
+      ezmarkup_formula <- paste0(
+        ".", paste0(rep(unit_markup, nrow(attr(tbl, "labels"))), collapse = ""))
+    }else{
+      ezmarkup_formula <- paste0(paste0(rep(".", n_group), collapse = ""),
+                                 ".", unit_markup)
     }
-    table_export <- table_export %>% melt(id.var = c(group.name, "variable"), variable.name = "stats.var")
-    dcast_formula <- paste0("dcast(table_export, variable ~ ", paste0(c(group.name, "stats.var"), collapse = " + "), ")")
-    table_export <- eval(parse(text = dcast_formula))
+    tbl_summary <- ezmarkup(tbl_summary, ezmarkup_formula)
   }
 
-  # Fix the sorting of variable
-  table_export$variable <- factor(table_export$variable, levels = var.name)
-  table_export <- arrange(table_export, variable)
+  attr(tbl_summary, "flavor") <- flavor
 
-  attributes(table_export)$vars <- group.name
-  attributes(table_export)$n.group <- n.group
-  attributes(table_export)$n.var <- n.var
-  attr(table_export, "class") <- c("tbl_df", "tbl", "data.frame")
-  attr(table_export, "group_sizes") <- NULL
-  attr(table_export, "biggest_group_size") <- NULL
-  return(table_export)
+  return(tbl_summary)
 }
 
+#' @rdname ezsummary_quantitative
+#' @export
+ezsummary_q <- ezsummary_quantitative
