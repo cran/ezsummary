@@ -50,7 +50,7 @@ mtcars %>%
 
 ## ----ezsummary_q_6-------------------------------------------------------
 mtcars %>%
-  ezsummary(rounding_method = "ceiling") %>%
+  ezsummary(rounding_type = "ceiling") %>%
   kable()
 
 ## ----ezsummary_c_1-------------------------------------------------------
